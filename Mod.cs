@@ -1,0 +1,70 @@
+using System.Collections.Generic;
+using Colossal;
+using Colossal.IO.AssetDatabase;
+using Colossal.Logging;
+using Game;
+using Game.Modding;
+using Game.SceneFlow;
+using Game.Simulation;
+
+namespace EmergencyPriority
+{
+    public class Mod : IMod
+    {
+        public static ILog log = LogManager.GetLogger($"{nameof(EmergencyPriority)}.{nameof(Mod)}").SetShowsErrorsInUI(false);
+        public static Setting ActiveSetting;
+
+        public void OnLoad(UpdateSystem updateSystem)
+        {
+            log.Info(nameof(OnLoad));
+
+            ActiveSetting = new Setting(this);
+            ActiveSetting.RegisterInOptionsUI();
+            GameManager.instance.localizationManager.AddSource("en-US", new LocaleEn(ActiveSetting));
+            AssetDatabase.global.LoadSettings(nameof(EmergencyPriority), ActiveSetting, new Setting(this));
+
+            // After the stuck detector so a freshly raised Stuck flag is converted to a repath before the vehicle
+            // AI systems (which run in the same phase) can take their delete branch.
+            updateSystem.UpdateAfter<EmergencyRepathSystem, StuckMovingObjectSystem>(SystemUpdatePhase.GameSimulation);
+
+            log.Info("[SelfTest] EmergencyPriority loaded (despawn guard + auto re-route).");
+        }
+
+        public void OnDispose()
+        {
+            log.Info(nameof(OnDispose));
+            if (ActiveSetting != null)
+            {
+                ActiveSetting.UnregisterInOptionsUI();
+                ActiveSetting = null;
+            }
+        }
+    }
+
+    // Minimal English locale (full localization once mechanics are proven, same pipeline as EconomyTweaks).
+    public class LocaleEn : IDictionarySource
+    {
+        private readonly Setting m_S;
+        public LocaleEn(Setting setting) { m_S = setting; }
+
+        public IEnumerable<KeyValuePair<string, string>> ReadEntries(IList<IDictionaryEntryError> errors, Dictionary<string, int> indexCounts)
+        {
+            return new Dictionary<string, string>
+            {
+                { m_S.GetSettingsLocaleID(), "Emergency Priority" },
+                { m_S.GetOptionTabLocaleID(Setting.Section), "Main" },
+                { m_S.GetOptionGroupLocaleID(Setting.Group), "Responding vehicles" },
+                { m_S.GetOptionLabelLocaleID(nameof(Setting.Enabled)), "Enable Emergency Priority" },
+                { m_S.GetOptionDescLocaleID(nameof(Setting.Enabled)), "Keeps responding fire engines, ambulances and police cars alive and moving through traffic jams. Off = vanilla behaviour." },
+                { m_S.GetOptionLabelLocaleID(nameof(Setting.DespawnGuard)), "Prevent stuck responders from despawning" },
+                { m_S.GetOptionDescLocaleID(nameof(Setting.DespawnGuard)), "Vanilla deletes a responding vehicle once it is flagged as stuck in traffic, and the emergency waits for a re-dispatch. With the guard, the vehicle looks for a new route instead." },
+                { m_S.GetOptionLabelLocaleID(nameof(Setting.AutoReroute)), "Re-route around congestion" },
+                { m_S.GetOptionDescLocaleID(nameof(Setting.AutoReroute)), "Vanilla plans the route once, at dispatch. With this on, a responder that sits blocked in a jam requests a fresh route that accounts for current traffic." },
+                { m_S.GetOptionLabelLocaleID(nameof(Setting.RerouteAfterSeconds)), "Re-route after (seconds blocked)" },
+                { m_S.GetOptionDescLocaleID(nameof(Setting.RerouteAfterSeconds)), "How long a responder must be continuously stuck behind traffic before it looks for a detour." },
+            };
+        }
+
+        public void Unload() { }
+    }
+}
