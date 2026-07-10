@@ -8,6 +8,10 @@
 	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
 	<LongDescription>
 Vanilla Cities Skylines II deletes a responding fire engine, ambulance or police car outright once it is flagged as stuck in traffic, and never re-evaluates its route after dispatch. This mod keeps responding units alive and re-routes them around congestion using the game's own pathfinding.
+
+Source (open source, MIT): https://github.com/AmicusDeus/EmergencyPriority
+
+Made with Claude Code, Anthropic's agentic coding tool.
 	</LongDescription>
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
@@ -28,7 +32,7 @@ Vanilla Cities Skylines II deletes a responding fire engine, ambulance or police
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog Value="Initial public release." />
 	<!--External link, can be set multiple times. supported types are "discord", "github", "youtube", "twitch", "x", "paypal", "patreon", "buymeacoffee", "kofi", "crowdin", "gitlab", "gofundme"-->
-	<ExternalLink Type="" Url="" />
+	<ExternalLink Type="github" Url="https://github.com/AmicusDeus/EmergencyPriority" />
 	<!--Supported values Public, Private, Unlisted-->
 	<AccessLevel Value="Public" />
 </Publish>
