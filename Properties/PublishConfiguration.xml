@@ -11,7 +11,7 @@ Vanilla Cities Skylines II deletes a responding fire engine, ambulance or police
 
 Source (open source, MIT): https://github.com/AmicusDeus/EmergencyPriority
 
-Made with Claude Code, Anthropic's agentic coding tool.
+Made with Claude Code's Opus 4.8 and Fable 5 models.
 	</LongDescription>
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
