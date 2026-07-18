@@ -22,6 +22,9 @@ namespace EmergencyPriority
             ActiveSetting.RegisterInOptionsUI();
             GameManager.instance.localizationManager.AddSource("en-US", new LocaleEn(ActiveSetting));
             AssetDatabase.global.LoadSettings(nameof(EmergencyPriority), ActiveSetting, new Setting(this));
+            // Belt-and-suspenders: write every settings change straight to disk the moment it's applied, so a crash or
+            // non-clean exit can't lose it (CS2 otherwise only flushes the ModSetting .coc on a clean Quit-to-Desktop).
+            ActiveSetting.onSettingsApplied += OnSettingsApplied;
 
             // After the stuck detector so a freshly raised Stuck flag is converted to a repath before the vehicle
             // AI systems (which run in the same phase) can take their delete branch.
@@ -32,11 +35,24 @@ namespace EmergencyPriority
             log.Info("[SelfTest] EmergencyPriority loaded (despawn guard + auto re-route).");
         }
 
+        // Persist a settings change to disk as soon as it is applied. Guarded because ApplyAndSave re-raises
+        // onSettingsApplied, which would otherwise recurse.
+        private static bool s_savingReentrant;
+        private static void OnSettingsApplied(Game.Settings.Setting setting)
+        {
+            if (s_savingReentrant)
+                return;
+            s_savingReentrant = true;
+            try { ActiveSetting?.ApplyAndSave(); }
+            finally { s_savingReentrant = false; }
+        }
+
         public void OnDispose()
         {
             log.Info(nameof(OnDispose));
             if (ActiveSetting != null)
             {
+                ActiveSetting.onSettingsApplied -= OnSettingsApplied;
                 ActiveSetting.UnregisterInOptionsUI();
                 ActiveSetting = null;
             }
