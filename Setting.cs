@@ -9,6 +9,7 @@ namespace EmergencyPriority
     {
         public const string Section = "Main";
         public const string Group = "Emergency";
+        public const string GroupGeneral = "General";
 
         public Setting(IMod mod) : base(mod) { }
 
@@ -34,12 +35,17 @@ namespace EmergencyPriority
         [SettingsUISection(Section, Group)]
         public int RerouteAfterSeconds { get; set; } = 5;
 
+        // Keep platform achievements enabled while this mod is active (the game otherwise disables them for any mod).
+        [SettingsUISection(Section, GroupGeneral)]
+        public bool EnableAchievements { get; set; } = true;
+
         public override void SetDefaults()
         {
             Enabled = true;
             DespawnGuard = true;
             AutoReroute = true;
             RerouteAfterSeconds = 5;
+            EnableAchievements = true;
         }
     }
 }

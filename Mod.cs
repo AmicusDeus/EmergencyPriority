@@ -26,6 +26,8 @@ namespace EmergencyPriority
             // After the stuck detector so a freshly raised Stuck flag is converted to a repath before the vehicle
             // AI systems (which run in the same phase) can take their delete branch.
             updateSystem.UpdateAfter<EmergencyRepathSystem, StuckMovingObjectSystem>(SystemUpdatePhase.GameSimulation);
+            // Keep platform achievements enabled while the mod is active.
+            updateSystem.UpdateAt<AchievementEnablerSystem>(SystemUpdatePhase.GameSimulation);
 
             log.Info("[SelfTest] EmergencyPriority loaded (despawn guard + auto re-route).");
         }
@@ -62,6 +64,10 @@ namespace EmergencyPriority
                 { m_S.GetOptionDescLocaleID(nameof(Setting.AutoReroute)), "Vanilla plans the route once, at dispatch. With this on, a responder that sits blocked in a jam requests a fresh route that accounts for current traffic." },
                 { m_S.GetOptionLabelLocaleID(nameof(Setting.RerouteAfterSeconds)), "Re-route after (seconds blocked)" },
                 { m_S.GetOptionDescLocaleID(nameof(Setting.RerouteAfterSeconds)), "How long a responder must be continuously stuck behind traffic before it looks for a detour." },
+
+                { m_S.GetOptionGroupLocaleID(Setting.GroupGeneral), "General" },
+                { m_S.GetOptionLabelLocaleID(nameof(Setting.EnableAchievements)), "Keep achievements enabled" },
+                { m_S.GetOptionDescLocaleID(nameof(Setting.EnableAchievements)), "Cities: Skylines II disables achievements whenever any mod is active. This re-enables them. Safe to leave on." },
             };
         }
 
