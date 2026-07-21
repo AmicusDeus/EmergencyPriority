@@ -2,7 +2,7 @@
 
 Keeps responding fire engines, ambulances and police cars alive and moving through traffic jams in **Cities: Skylines II**.
 
-**Paradox Mods:** https://mods.paradoxplaza.com/mods/150540
+**Paradox Mods:** https://mods.paradoxplaza.com/mods/150540/Windows
 
 ## What it does
 Vanilla CS2 deletes a responding emergency vehicle the moment it's flagged as stuck in traffic, and never re-evaluates its route after dispatch. This mod:
