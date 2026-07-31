@@ -77,7 +77,7 @@ namespace EmergencyPriority
 
         protected override void OnUpdate()
         {
-            Setting s = Mod.ActiveSetting;
+            EmergencyPrioritySetting s = Mod.ActiveSetting;
             if (s == null || !s.Enabled || (!s.DespawnGuard && !s.AutoReroute))
                 return;
 

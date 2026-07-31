@@ -11,6 +11,9 @@ Vanilla Cities Skylines II deletes a responding fire engine, ambulance or police
 
 Source (open source, MIT): https://github.com/AmicusDeus/EmergencyPriority
 
+Localized into 11 languages (German, Spanish, French, Italian, Japanese, Korean, Polish, Portuguese-BR, Russian, Chinese Simplified &amp; Traditional). Translations are machine-generated — corrections welcome.
+
+
 Made with Claude Code's Opus 4.8 and Fable 5 models.
 	</LongDescription>
 	<!--Thumbnail-->
@@ -22,7 +25,7 @@ Made with Claude Code's Opus 4.8 and Fable 5 models.
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.02" />
+	<ModVersion Value="1.04" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.6.*" />
 	<!--Dependency for the mod, can be set multiple times-->
@@ -30,7 +33,7 @@ Made with Claude Code's Opus 4.8 and Fable 5 models.
 	<!--Required DLC, can be set multiple times. Supported values are "Landmark Buildings", "San Fransisco Set", "Beach Properties", "Urban Promenades", "Modern Architecture"-->
 	<RequiredDLC Value="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-	<ChangeLog Value="Settings now save to disk the instant you change them, so the re-route delay (and the other options) survive a crash or a non-clean exit — not only a clean Quit-to-Desktop." />
+	<ChangeLog Value="v1.04 — Localization: the Options page and in-game panels are now translated into 11 languages (German, Spanish, French, Italian, Japanese, Korean, Polish, Portuguese-BR, Russian, Chinese Simplified &amp; Traditional). Machine-translated — community corrections welcome." />
 	<!--External link, can be set multiple times. supported types are "discord", "github", "youtube", "twitch", "x", "paypal", "patreon", "buymeacoffee", "kofi", "crowdin", "gitlab", "gofundme"-->
 	<ExternalLink Type="github" Url="https://github.com/AmicusDeus/EmergencyPriority" />
 	<!--Supported values Public, Private, Unlisted-->

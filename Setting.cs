@@ -4,14 +4,18 @@ using Game.Settings;
 
 namespace EmergencyPriority
 {
+    // NOTE: the class SIMPLE NAME must stay unique across all of this author's mods. Setting.ApplyAndSave() saves via
+    // AssetDatabase.SaveSpecificSetting(GetType().Name), which resolves by simple name and breaks on the first match —
+    // so two mods both named `Setting` write into whichever one wins the race. Nothing on disk derives from the class
+    // name; the [FileLocation] value and the LoadSettings(...) name argument are the on-disk identity, not this.
     [FileLocation(nameof(EmergencyPriority))]
-    public class Setting : ModSetting
+    public class EmergencyPrioritySetting : ModSetting
     {
         public const string Section = "Main";
         public const string Group = "Emergency";
         public const string GroupGeneral = "General";
 
-        public Setting(IMod mod) : base(mod) { }
+        public EmergencyPrioritySetting(IMod mod) : base(mod) { }
 
         // NOTE: initializers double as the settings-migration failsafe (missing keys in an old .coc keep these
         // values instead of defaulting to 0/false).
@@ -35,17 +39,12 @@ namespace EmergencyPriority
         [SettingsUISection(Section, Group)]
         public int RerouteAfterSeconds { get; set; } = 5;
 
-        // Keep platform achievements enabled while this mod is active (the game otherwise disables them for any mod).
-        [SettingsUISection(Section, GroupGeneral)]
-        public bool EnableAchievements { get; set; } = true;
-
         public override void SetDefaults()
         {
             Enabled = true;
             DespawnGuard = true;
             AutoReroute = true;
             RerouteAfterSeconds = 5;
-            EnableAchievements = true;
         }
     }
 }
