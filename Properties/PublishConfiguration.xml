@@ -25,7 +25,7 @@ Made with Claude Code's Opus 4.8 and Fable 5 models.
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.04" />
+	<ModVersion Value="1.05" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.6.*" />
 	<!--Dependency for the mod, can be set multiple times-->
@@ -33,7 +33,13 @@ Made with Claude Code's Opus 4.8 and Fable 5 models.
 	<!--Required DLC, can be set multiple times. Supported values are "Landmark Buildings", "San Fransisco Set", "Beach Properties", "Urban Promenades", "Modern Architecture"-->
 	<RequiredDLC Value="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-	<ChangeLog Value="v1.04 — Localization: the Options page and in-game panels are now translated into 11 languages (German, Spanish, French, Italian, Japanese, Korean, Polish, Portuguese-BR, Russian, Chinese Simplified &amp; Traditional). Machine-translated — community corrections welcome." />
+	<ChangeLog Value="v1.05 — Settings are now saved properly.
+
+A bug meant this mod's settings were often not written to disk. Changes worked while you played, then quietly reverted to defaults the next time you launched. Some settings never saved at all.
+
+The cause was a name clash between mods by the same author: the game picks which settings file to write by the name of the mod's settings class, and all of them used the same name, so one mod would win and the rest wrote nowhere. Each mod now has its own name.
+
+Please check your settings after updating — if you had configured this mod before, it may have been running on defaults without any sign that anything was wrong. Your existing saved settings are not affected by this update." />
 	<!--External link, can be set multiple times. supported types are "discord", "github", "youtube", "twitch", "x", "paypal", "patreon", "buymeacoffee", "kofi", "crowdin", "gitlab", "gofundme"-->
 	<ExternalLink Type="github" Url="https://github.com/AmicusDeus/EmergencyPriority" />
 	<!--Supported values Public, Private, Unlisted-->
