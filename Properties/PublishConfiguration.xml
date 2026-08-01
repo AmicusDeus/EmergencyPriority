@@ -25,7 +25,7 @@ Made with Claude Code's Opus 4.8 and Fable 5 models.
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.05" />
+	<ModVersion Value="1.06" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.6.*" />
 	<!--Dependency for the mod, can be set multiple times-->
@@ -33,13 +33,15 @@ Made with Claude Code's Opus 4.8 and Fable 5 models.
 	<!--Required DLC, can be set multiple times. Supported values are "Landmark Buildings", "San Fransisco Set", "Beach Properties", "Urban Promenades", "Modern Architecture"-->
 	<RequiredDLC Value="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-	<ChangeLog Value="v1.05 — Settings are now saved properly.
+	<ChangeLog>
+v1.06 - Stuck responders stop asking for a new route over and over
 
-A bug meant this mod's settings were often not written to disk. Changes worked while you played, then quietly reverted to defaults the next time you launched. Some settings never saved at all.
+- FIX: a fire engine, ambulance or police car sitting in a jam could keep requesting a new route every few seconds for as long as the jam lasted, without ever getting anywhere. The cause is that the game works out congestion from a rolling average for that time of day rather than from the traffic actually there right now, so a jam that has just started is barely visible to it, and asking again can simply hand back the road the vehicle is already stuck on.
 
-The cause was a name clash between mods by the same author: the game picks which settings file to write by the name of the mod's settings class, and all of them used the same name, so one mod would win and the rest wrote nowhere. Each mod now has its own name.
+Now each repeat request from a vehicle that has not moved waits twice as long as the one before: about 10 seconds, then 20, 40, 80, and 160 at most. The first request is unchanged, because that is the one most likely to help - conditions really may have changed since the vehicle was sent out. The moment the vehicle moves again it goes straight back to being fully responsive.
 
-Please check your settings after updating — if you had configured this mod before, it may have been running on defaults without any sign that anything was wrong. Your existing saved settings are not affected by this update." />
+It never stops trying, so a responder still gets going when the jam finally clears.
+	</ChangeLog>
 	<!--External link, can be set multiple times. supported types are "discord", "github", "youtube", "twitch", "x", "paypal", "patreon", "buymeacoffee", "kofi", "crowdin", "gitlab", "gofundme"-->
 	<ExternalLink Type="github" Url="https://github.com/AmicusDeus/EmergencyPriority" />
 	<!--Supported values Public, Private, Unlisted-->
