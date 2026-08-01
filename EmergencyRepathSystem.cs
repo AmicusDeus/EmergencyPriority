@@ -34,10 +34,28 @@ namespace EmergencyPriority
         private const uint kWatchRefreshFrames = 64;
         private const float kSimFramesPerSecond = 60f;
 
+        // Consecutive-reroute backoff. Each successive reroute for a vehicle that has NOT moved since the last one
+        // doubles the cooldown, capped at kMaxBackoffShift doublings.
+        //
+        // WHY. A reroute can legitimately return THE SAME PATH. The pathfinder prices congestion from
+        // NetData/m_FlowOffset, which is a four-bin TIME-OF-DAY average smoothed at alpha <= 0.125 — not current
+        // traffic. A jam that started a minute ago is barely represented, so asking again mid-jam can hand back the
+        // road the vehicle is already stuck on. Without a backoff the vehicle then re-asks every cooldown for as long
+        // as the jam lasts, burning an emergency pathfind query each time and achieving nothing.
+        //
+        // The FIRST reroute keeps the plain cooldown: that is the one most likely to help, because conditions really
+        // may have changed since dispatch. Only repeats escalate. Any tick where the vehicle is no longer blocked
+        // resets the streak, so a vehicle that gets moving again is fully responsive next time it snags.
+        //
+        // Deliberately never gives up: an emergency responder that stops retrying just stays stuck, and at the capped
+        // interval a retry costs almost nothing while still catching the moment the jam finally clears.
+        private const int kMaxBackoffShift = 4;   // cooldown x2 .. x16 of the base (itself 2x the blocked threshold)
+
         private struct WatchState
         {
             public uint BlockedSince;   // frame the current continuous-blocked stretch started (0 = not blocked)
             public uint LastReroute;    // frame of the last Obsolete we issued for being blocked
+            public byte Streak;         // consecutive reroutes with no movement in between; drives the backoff
         }
 
         private EntityQuery m_CarQuery;
@@ -114,8 +132,16 @@ namespace EmergencyPriority
                         po.m_State |= PathFlags.Obsolete;
                     EntityManager.SetComponentData(e, po);
                     m_GuardedStuck++;
-                    // A repath is now underway; restart the blocked clock.
-                    m_State[e] = new WatchState { BlockedSince = 0, LastReroute = frame };
+                    // A repath is now underway; restart the blocked clock. PRESERVE and advance the backoff streak
+                    // rather than assigning a fresh WatchState: a vehicle that keeps tripping vanilla's stuck
+                    // detector is in a hopeless spot, and wiping the streak here would let it reset its own backoff
+                    // indefinitely and re-ask for a path as fast as the guard fires. The guard itself is unaffected —
+                    // it runs before this and never consults the cooldown, so despawn protection is never delayed.
+                    m_State.TryGetValue(e, out WatchState gs);
+                    gs.BlockedSince = 0;
+                    gs.LastReroute = frame;
+                    if (gs.Streak < byte.MaxValue) gs.Streak++;
+                    m_State[e] = gs;
                     continue;
                 }
 
@@ -128,9 +154,13 @@ namespace EmergencyPriority
                 m_State.TryGetValue(e, out WatchState st);
                 if (!blocked)
                 {
-                    if (st.BlockedSince != 0)
+                    // Moving again: clear the blocked clock AND the backoff. Whatever we last did (or the traffic
+                    // clearing on its own) worked, so the next snag gets the full, responsive first-reroute cooldown
+                    // rather than inheriting an escalation from an unrelated earlier jam.
+                    if (st.BlockedSince != 0 || st.Streak != 0)
                     {
                         st.BlockedSince = 0;
+                        st.Streak = 0;
                         m_State[e] = st;
                     }
                     continue;
@@ -141,13 +171,20 @@ namespace EmergencyPriority
                     m_State[e] = st;
                     continue;
                 }
-                if (frame - st.BlockedSince >= rerouteFrames && frame - st.LastReroute >= cooldownFrames
+                // Backoff applies to the COOLDOWN only, never to the blocked threshold: the vehicle still has to be
+                // continuously stuck for the player's configured time, we just refuse to re-ask so soon after a
+                // reroute that produced nothing. Shift is bounded by kMaxBackoffShift so this cannot overflow.
+                uint effectiveCooldown = cooldownFrames << (st.Streak < kMaxBackoffShift ? st.Streak : kMaxBackoffShift);
+                if (frame - st.BlockedSince >= rerouteFrames && frame - st.LastReroute >= effectiveCooldown
                     && !pending && (po.m_State & (PathFlags.Obsolete | PathFlags.Failed)) == 0)
                 {
                     po.m_State |= PathFlags.Obsolete; // RequireNewPath => fresh congestion-aware emergency pathfind
                     EntityManager.SetComponentData(e, po);
                     st.LastReroute = frame;
                     st.BlockedSince = 0;
+                    // Escalate only while the vehicle stays stuck. Saturate rather than wrap — Streak is a byte and
+                    // a responder can sit in a bad jam for a long time.
+                    if (st.Streak < byte.MaxValue) st.Streak++;
                     m_State[e] = st;
                     m_Reroutes++;
                 }
