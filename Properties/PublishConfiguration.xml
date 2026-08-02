@@ -19,7 +19,12 @@ Made with Claude Code's Opus 4.8 and Fable 5 models.
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
 	<!--Screenshot, can be set multiple times-->
-	<Screenshot Value="" />
+	<!--THESE MUST STAY LISTED AND THE FILES MUST STAY IN THE REPO. ModPublisher treats this config as the
+	    COMPLETE state of the store page: an empty value and a missing element parse identically, and both send
+	    an empty list. Captured from the live store page 2026-08-02 so every publish RE-ASSERTS them instead of
+	    risking a wipe. A listed-but-missing file fails loudly, which is the safe direction.-->
+	<Screenshot Value="Properties/Screenshots/screenshot_01.jpg" />
+	<Screenshot Value="Properties/Screenshots/screenshot_02.jpg" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="" />
 	<!--Link to the forum post where the mod can be discussed-->
